@@ -1,0 +1,25 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../Downloads/hackUmass-main/app"
+		},
+		{
+			"path": "../../Downloads/hackUmass-main/components"
+		},
+		{
+			"path": "../../Downloads/hackUmass-main/hooks"
+		},
+		{
+			"path": "../../Downloads/hackUmass-main/lib"
+		},
+		{
+			"path": "../../Downloads/hackUmass-main/supabase"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "Umass Hackathon"
+	}
+}

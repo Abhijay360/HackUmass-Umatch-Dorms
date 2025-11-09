@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roommate & Dorm Compatibility Test</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font and scroll behavior */
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        .input-card {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        .input-card:hover {
+            transform: translateY(-2px);
+        }
+        .match-button {
+            transition: all 0.2s ease;
+        }
+        .match-button:hover:not(:disabled) {
+            transform: scale(1.03);
+            box-shadow: 0 8px 15px rgba(34, 197, 94, 0.4);
+        }
+        .step-indicator {
+            transition: all 0.3s ease;
+        }
+        .step-active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .step-completed {
+            background: #10b981;
+            color: white;
+        }
+        .question-section {
+            display: none;
+        }
+        .question-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        <header class="text-center py-6 mb-8 bg-white/70 backdrop-blur-sm rounded-xl shadow-lg">
+            <h1 class="text-4xl font-extrabold text-gray-800">Roommate & Dorm Compatibility Test 🏡</h1>
+            <p class="text-lg text-gray-600 mt-2">Complete the questionnaire to find your perfect roommate and dorm match.</p>
+        </header>
+
+        <!-- Progress Indicator -->
+        <div class="mb-6 bg-white p-4 rounded-xl shadow-lg">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-medium text-gray-600">Progress</span>
+                <span id="progressText" class="text-sm font-medium text-gray-600">Step 1 of 6</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div id="progressBar" class="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full transition-all duration-300" style="width: 16.67%"></div>
+            </div>
+        </div>
+
+        <!-- Questionnaire Form -->
+        <form id="compatibilityForm" class="bg-white p-8 rounded-xl shadow-2xl border border-gray-200">
+            
+            <!-- Step 1: Basic Info & Budget -->
+            <div class="question-section active" id="step1">
+                <h2 class="text-2xl font-bold mb-6 text-indigo-700">Basic Information & Budget</h2>
+                <div class="space-y-5">
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Are you a first-year or upperclassman?</span>
+                        <select id="yearStatus" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select status</option>
+                            <option value="first-year">First-year</option>
+                            <option value="upperclassman">Upperclassman</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">What is your major?</span>
+                        <select id="major" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select major</option>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Engineering">Engineering</option>
+                            <option value="Business">Business</option>
+                            <option value="Psychology">Psychology</option>
+                            <option value="English">English</option>
+                            <option value="Biology">Biology</option>
+                            <option value="Mathematics">Mathematics</option>
+                            <option value="General">General / Other</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">What is your preferred room type?</span>
+                        <select id="roomType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select room type</option>
+                            <option value="double">Double</option>
+                            <option value="quad">Quad</option>
+                            <option value="suite">Suite</option>
+                            <option value="apartment">Apartment-style</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">What is your gender?</span>
+                        <select id="genderType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="non-binary">Non-binary</option>
+                            <option value="prefer-not-to-say">Prefer not to say</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Do you require accessible housing (e.g., wheelchair access, elevator)?</span>
+                        <select id="accessible" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select option</option>
+                            <option value="yes">Yes, required</option>
+                            <option value="preferred">Preferred but not required</option>
+                            <option value="no">No</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Are you an honors student?</span>
+                        <select id="isHonors" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select option</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Do you need break housing?</span>
+                        <select id="breakHousing" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select option</option>
+                            <option value="yes">Yes, required</option>
+                            <option value="preferred">Preferred</option>
+                            <option value="no">No</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Step 2: Social & Lifestyle -->
+            <div class="question-section" id="step2">
+                <h2 class="text-2xl font-bold mb-6 text-indigo-700">Social & Lifestyle Preferences</h2>
+                <div class="space-y-5">
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">How social do you want your dorm to be?</span>
+                        <select id="socialLevelType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select level</option>
+                            <option value="very-social">Very social (lots of interaction)</option>
+                            <option value="moderately-social">Moderately social</option>
+                            <option value="somewhat-social">Somewhat social</option>
+                            <option value="minimal-social">Minimal social interaction</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">What is your preferred noise level?</span>
+                        <select id="noiseLevelType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select preference</option>
+                            <option value="very-quiet">Very quiet</option>
+                            <option value="quiet">Quiet</option>
+                            <option value="moderate">Moderate</option>
+                            <option value="somewhat-loud">Somewhat loud</option>
+                            <option value="loud">Loud (party-friendly)</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">How important are organized dorm activities or events to you?</span>
+                        <select id="activitiesImportance" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select importance</option>
+                            <option value="very-important">Very important</option>
+                            <option value="important">Important</option>
+                            <option value="somewhat-important">Somewhat important</option>
+                            <option value="not-important">Not important</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Do you prefer a party-friendly environment or a quiet academic one?</span>
+                        <select id="environmentPref" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select preference</option>
+                            <option value="party-friendly">Party-friendly</option>
+                            <option value="balanced">Balanced</option>
+                            <option value="quiet-academic">Quiet academic</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Would you like to live with upperclassmen, first-years, or a mix?</span>
+                        <select id="yearPref" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select preference</option>
+                            <option value="first-years">First-years</option>
+                            <option value="upperclassmen">Upperclassmen</option>
+                            <option value="mix">Mix</option>
+                            <option value="no-preference">No preference</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Are you an early bird or a night owl?</span>
+                        <select id="sleepSchedule" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select schedule</option>
+                            <option value="early-bird">Early bird</option>
+                            <option value="balanced">Balanced</option>
+                            <option value="night-owl">Night owl</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">How tidy do you consider yourself?</span>
+                        <select id="tidinessLevel" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select level</option>
+                            <option value="very-tidy">Very tidy</option>
+                            <option value="tidy">Tidy</option>
+                            <option value="moderately-tidy">Moderately tidy</option>
+                            <option value="somewhat-messy">Somewhat messy</option>
+                            <option value="messy">Messy</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Do you prefer a roommate who shares your lifestyle habits (sleep, noise, guests)?</span>
+                        <select id="lifestyleMatch" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select preference</option>
+                            <option value="very-important">Very important</option>
+                            <option value="important">Important</option>
+                            <option value="somewhat-important">Somewhat important</option>
+                            <option value="not-important">Not important</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">How often do you plan to have guests over?</span>
+                        <select id="guestFrequencyType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select frequency</option>
+                            <option value="daily">Daily</option>
+                            <option value="several-times-week">Several times a week</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="rarely">Rarely</option>
+                            <option value="never">Never</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Step 3: Amenities & Facilities -->
+            <div class="question-section" id="step3">
+                <h2 class="text-2xl font-bold mb-6 text-indigo-700">Amenities & Facilities</h2>
+                <div class="space-y-5">
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">How important is having a kitchen or kitchenette?</span>
+                        <select id="kitchenImportanceType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select importance</option>
+                            <option value="essential">Essential</option>
+                            <option value="very-important">Very important</option>
+                            <option value="important">Important</option>
+                            <option value="nice-to-have">Nice to have</option>
+                            <option value="not-important">Not important</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Do you need laundry facilities in-building?</span>
+                        <select id="laundry" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select option</option>
+                            <option value="yes-required">Yes, required</option>
+                            <option value="preferred">Preferred</option>
+                            <option value="no-preference">No preference</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Would you prefer a private bathroom or is a shared one fine?</span>
+                        <select id="bathroom" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select preference</option>
+                            <option value="private-required">Private (required)</option>
+                            <option value="private-preferred">Private (preferred)</option>
+                            <option value="shared-fine">Shared is fine</option>
+                            <option value="no-preference">No preference</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Do you want air conditioning, heating, or climate control in the room?</span>
+                        <select id="climateControl" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select option</option>
+                            <option value="ac-required">AC required</option>
+                            <option value="heating-required">Heating required</option>
+                            <option value="both-required">Both required</option>
+                            <option value="preferred">Preferred</option>
+                            <option value="no-preference">No preference</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">How important is proximity to campus facilities (library, gym, dining hall)?</span>
+                        <select id="campusProximity" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select importance</option>
+                            <option value="essential">Essential</option>
+                            <option value="very-important">Very important</option>
+                            <option value="important">Important</option>
+                            <option value="nice-to-have">Nice to have</option>
+                            <option value="not-important">Not important</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Do you prefer a quiet area or to be near main campus activity?</span>
+                        <select id="activityProximity" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select preference</option>
+                            <option value="quiet-area">Quiet area</option>
+                            <option value="balanced">Balanced</option>
+                            <option value="near-activity">Near main campus activity</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Would you prefer green spaces or urban proximity?</span>
+                        <select id="spaceType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select preference</option>
+                            <option value="green-spaces">Green spaces</option>
+                            <option value="urban">Urban proximity</option>
+                            <option value="balanced">Balanced</option>
+                            <option value="no-preference">No preference</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">How far are you willing to walk or commute to class daily?</span>
+                        <select id="commuteDistanceType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select distance</option>
+                            <option value="under-5min">Under 5 minutes</option>
+                            <option value="5-10min">5-10 minutes</option>
+                            <option value="10-15min">10-15 minutes</option>
+                            <option value="15-20min">15-20 minutes</option>
+                            <option value="over-20min">Over 20 minutes</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Would you like a dorm with outdoor or recreational space (courtyard, rooftop, etc.)?</span>
+                        <select id="outdoorSpaceType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select preference</option>
+                            <option value="yes-required">Yes, required</option>
+                            <option value="yes-preferred">Yes, preferred</option>
+                            <option value="nice-to-have">Nice to have</option>
+                            <option value="not-important">Not important</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Step 4: Community & Interests -->
+            <div class="question-section" id="step4">
+                <h2 class="text-2xl font-bold mb-6 text-indigo-700">Community & Interests</h2>
+                <div class="space-y-5">
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">What kind of community appeals to you most?</span>
+                        <select id="communityType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select type</option>
+                            <option value="academic-focused">Academic-focused</option>
+                            <option value="arts-creative">Arts & Creative</option>
+                            <option value="sports-athletic">Sports & Athletic</option>
+                            <option value="diverse-multicultural">Diverse & Multicultural</option>
+                            <option value="lgbtq-friendly">LGBTQ+ friendly</option>
+                            <option value="international">International</option>
+                            <option value="general">General community</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">How important is it for you to live with people who share your interests?</span>
+                        <select id="sharedInterestsType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select importance</option>
+                            <option value="very-important">Very important</option>
+                            <option value="important">Important</option>
+                            <option value="somewhat-important">Somewhat important</option>
+                            <option value="not-important">Not important</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Would you like to live in a theme dorm or living-learning community?</span>
+                        <select id="themeDorm" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select preference</option>
+                            <option value="yes-required">Yes, required</option>
+                            <option value="yes-preferred">Yes, preferred</option>
+                            <option value="no-preference">No preference</option>
+                            <option value="no">No</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Step 5: Special Needs & Accommodations -->
+            <div class="question-section" id="step5">
+                <h2 class="text-2xl font-bold mb-6 text-indigo-700">Special Needs & Accommodations</h2>
+                <div class="space-y-5">
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Do you have any medical or accessibility requirements?</span>
+                        <textarea id="medicalRequirements" rows="3" placeholder="Describe any medical or accessibility needs (leave blank if none)"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border"></textarea>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Are you sensitive to pets, smoke, or allergens?</span>
+                        <select id="sensitivitiesType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select option</option>
+                            <option value="pets">Pets</option>
+                            <option value="smoke">Smoke</option>
+                            <option value="allergens">Allergens</option>
+                            <option value="multiple">Multiple sensitivities</option>
+                            <option value="none">None</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Do you have dietary or religious accommodation needs?</span>
+                        <textarea id="dietaryReligious" rows="3" placeholder="Describe any dietary or religious accommodation needs (leave blank if none)"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border"></textarea>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Step 6: Priority Ranking -->
+            <div class="question-section" id="step6">
+                <h2 class="text-2xl font-bold mb-6 text-indigo-700">Priority Ranking</h2>
+                <p class="text-sm text-gray-600 mb-6">Please rank the following by importance (1 = most important, 4 = least important):</p>
+                <div class="space-y-5">
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Location</span>
+                        <select id="priorityLocation" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select rank</option>
+                            <option value="1">1 - Most important</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4 - Least important</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Privacy</span>
+                        <select id="priorityPrivacy" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select rank</option>
+                            <option value="1">1 - Most important</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4 - Least important</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Amenities</span>
+                        <select id="priorityAmenities" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select rank</option>
+                            <option value="1">1 - Most important</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4 - Least important</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700 mb-2 block">Social Atmosphere</span>
+                        <select id="prioritySocial" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                            <option value="">Select rank</option>
+                            <option value="1">1 - Most important</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4 - Least important</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+           
+            <!-- Navigation Buttons -->
+            <div class="flex justify-between mt-8 pt-6 border-t border-gray-200">
+                <button type="button" id="prevButton" class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed" style="display: none;">
+                    Previous
+                </button>
+                <button type="button" id="nextButton" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 ml-auto">
+                    Next
+                </button>
+                <button type="submit" id="submitButton" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700" style="display: none;">
+                    Find My Match
+                </button>
+            </div>
+        </form>
+
+        <!-- Results Area -->
+        <div id="loadingIndicator" class="hidden text-center p-8 bg-white/70 rounded-xl shadow-lg">
+            <svg class="animate-spin h-8 w-8 text-green-600 mx-auto mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="text-gray-700 font-medium">Analyzing compatibility... please wait.</p>
+        </div>
+
+        <div id="resultsContainer" class="hidden bg-white p-8 rounded-xl shadow-2xl border-t-4 border-green-500">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Compatibility Analysis Report</h2>
+           
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center mb-8">
+                <!-- Score Card -->
+                <div class="bg-gray-50 p-6 rounded-lg border-l-4 border-indigo-500">
+                    <p class="text-lg font-medium text-gray-500">Harmony Score</p>
+                    <p id="scoreDisplay" class="text-6xl font-extrabold text-indigo-600 mt-1">--</p>
+                    <p class="text-sm font-light text-gray-400">Out of 100</p>
+                </div>
+               
+                <!-- Confidence Card -->
+                <div class="bg-gray-50 p-6 rounded-lg border-l-4 border-indigo-500">
+                    <p class="text-lg font-medium text-gray-500">Engine Confidence</p>
+                    <p id="confidenceDisplay" class="text-3xl font-bold text-gray-700 mt-4">--</p>
+                    <p class="text-sm font-light text-gray-400">High, Medium, or Low</p>
+                </div>
+
+                <!-- Match Advice Card -->
+                <div class="bg-gray-50 p-6 rounded-lg border-l-4 border-indigo-500">
+                    <p class="text-lg font-medium text-gray-500">The Key to Success</p>
+                    <p id="adviceDisplay" class="text-base font-semibold text-gray-700 mt-3">--</p>
+                </div>
+            </div>
+
+            <!-- Reasoning Block -->
+            <div class="bg-green-50 p-6 rounded-lg border border-green-200">
+                <p class="text-lg font-bold text-green-700 mb-2">Detailed Reasoning</p>
+                <p id="reasoningDisplay" class="text-gray-800 italic">--</p>
+            </div>
+           
+        </div>
+       
+    </div>
+
+    <script>
+        // --- Global Variables (Mandatory for Canvas Environment) ---
+        // Note: The API_KEY is intentionally an empty string; it is injected by the Canvas runtime.
+        const API_KEY = "";
+        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
+        const MODEL_NAME = "gemini-2.5-flash-preview-09-2025";
+        const MAX_RETRIES = 5;
+        const TOTAL_STEPS = 6;
+        let currentStep = 1;
+
+        // --- DOM Elements ---
+        const form = document.getElementById('compatibilityForm');
+        const nextButton = document.getElementById('nextButton');
+        const prevButton = document.getElementById('prevButton');
+        const submitButton = document.getElementById('submitButton');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const confidenceDisplay = document.getElementById('confidenceDisplay');
+        const reasoningDisplay = document.getElementById('reasoningDisplay');
+        const adviceDisplay = document.getElementById('adviceDisplay');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+       
+        // --- AI Compatibility Model Definition ---
+        const MATCH_SCHEMA = {
+            "type": "OBJECT",
+            "properties": {
+                "compatibilityScore": {
+                    "type": "INTEGER",
+                    "description": "A compatibility score between 0 (Poor Match) and 100 (Perfect Match) for both roommate and dorm compatibility."
+                },
+                "confidenceLevel": {
+                    "type": "STRING",
+                    "enum": ["High", "Medium", "Low"],
+                    "description": "The LLM's confidence in the generated match score."
+                },
+                "reasoningSummary": {
+                    "type": "STRING",
+                    "description": "A comprehensive 2-3 sentence explanation covering both roommate compatibility (lifestyle, habits, social preferences) and dorm compatibility (amenities, location, community type) that contributed to the score."
+                },
+                "matchAdvice": {
+                    "type": "STRING",
+                    "description": "Actionable recommendations for both roommate harmony and dorm selection, addressing the biggest potential conflict points or mismatches."
+                }
+            },
+            "required": ["compatibilityScore", "confidenceLevel", "reasoningSummary", "matchAdvice"]
+        };
+
+        const SYSTEM_INSTRUCTION = (
+            "You are the 'Roommate & Dorm Compatibility Engine', a world-class AI designed to calculate compatibility " +
+            "between a student's preferences and potential roommates/dorms based on comprehensive lifestyle, housing, and community preferences. " +
+            "Your goal is to output a single, strictly valid JSON object conforming to the provided schema. " +
+            "DO NOT output any descriptive text or markdown outside of the JSON block." +
+            "\n\n--- Comprehensive Compatibility Rubric ---\n" +
+            "ROOMMATE COMPATIBILITY FACTORS:\n" +
+            "1. Sleep Schedule: Identical or complementary schedules yield +25 points. Major conflicts yield -25 points.\n" +
+            "2. Tidiness: Shared expectations yield +25 points. Clean vs. Messy yields -40 points.\n" +
+            "3. Social Habits & Noise: Aligned preferences yield +20 points. Extreme mismatches yield -30 points.\n" +
+            "4. Guest Frequency: Compatible expectations yield +15 points. Conflicts yield -20 points.\n" +
+            "5. Lifestyle Match Importance: If user values lifestyle match highly, weight these factors more heavily.\n" +
+            "6. Sensitivities: Pet/smoke/allergen conflicts yield -30 points. Compatible or no sensitivities yield +10 points.\n" +
+            "\nDORM COMPATIBILITY FACTORS:\n" +
+            "1. Budget: Match within range yields +15 points. Outside range yields -20 points.\n" +
+            "2. Room Type: Match preference yields +15 points. Mismatch yields -15 points.\n" +
+            "3. Gender Preference: Match yields +10 points.\n" +
+            "4. Location (On/Off-campus): Match yields +15 points.\n" +
+            "5. Accessibility: Required accessibility must match exactly (+20 if match, -50 if required but missing).\n" +
+            "6. Amenities (Kitchen, Laundry, Bathroom, Climate Control): Each match yields +5-10 points based on importance level.\n" +
+            "7. Campus Proximity: Match importance level yields +10-15 points.\n" +
+            "8. Social Level & Environment: Match yields +15 points. Mismatch yields -20 points.\n" +
+            "9. Community Type: Match yields +15 points. Partial match yields +5 points.\n" +
+            "10. Priority Rankings: Weight factors based on user's priority rankings (price, location, privacy, amenities, social).\n" +
+            "\nSPECIAL CONSIDERATIONS:\n" +
+            "- Medical/accessibility requirements are non-negotiable and must be met.\n" +
+            "- Dietary/religious accommodations should be considered for dorm dining options.\n" +
+            "- Theme dorms and living-learning communities should match user preferences.\n" +
+            "- Year preference (first-years vs upperclassmen) should be considered.\n"
+        );
+
+        // --- Multi-Step Form Navigation ---
+        function updateProgress() {
+            const progress = (currentStep / TOTAL_STEPS) * 100;
+            progressBar.style.width = progress + '%';
+            progressText.textContent = `Step ${currentStep} of ${TOTAL_STEPS}`;
+        }
+
+        function showStep(step) {
+            // Hide all steps
+            document.querySelectorAll('.question-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show current step
+            document.getElementById(`step${step}`).classList.add('active');
+            
+            // Update navigation buttons
+            prevButton.style.display = step === 1 ? 'none' : 'block';
+            nextButton.style.display = step === TOTAL_STEPS ? 'none' : 'block';
+            submitButton.style.display = step === TOTAL_STEPS ? 'block' : 'none';
+            
+            updateProgress();
+            
+            // Scroll to top of form
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function validateCurrentStep() {
+            const currentSection = document.getElementById(`step${currentStep}`);
+            const requiredFields = currentSection.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('border-red-500');
+                } else {
+                    field.classList.remove('border-red-500');
+                }
+            });
+            
+            // Special validation for priority ranking (step 6)
+            if (currentStep === 6) {
+                const priorities = [
+                    document.getElementById('priorityLocation').value,
+                    document.getElementById('priorityPrivacy').value,
+                    document.getElementById('priorityAmenities').value,
+                    document.getElementById('prioritySocial').value
+                ];
+                
+                // Check if all are unique
+                const uniquePriorities = new Set(priorities.filter(p => p));
+                if (uniquePriorities.size !== 4) {
+                    alert('Please assign unique ranks (1-4) to each priority factor.');
+                    isValid = false;
+                }
+            }
+            
+            return isValid;
+        }
+
+        nextButton.addEventListener('click', () => {
+            if (validateCurrentStep()) {
+                currentStep++;
+                showStep(currentStep);
+            } else {
+                alert('Please fill in all required fields before proceeding.');
+            }
+        });
+
+        prevButton.addEventListener('click', () => {
+            currentStep--;
+            showStep(currentStep);
+        });
+
+        // --- Core Fetch Function to Backend API ---
+        async function findCompatibilityMatch(userProfile) {
+            const BACKEND_URL = "http://localhost:8000/api/match";
+            const REQUEST_TIMEOUT = 120000; // 120 seconds (2 minutes) for quad room matching
+            
+            // Map frontend field names to backend expected field names
+            const backendProfile = {
+                // Step 1: Basic Information
+                yearStatus: userProfile.yearStatus,
+                major: userProfile.major || "General",
+                roomType: userProfile.roomType,
+                genderType: userProfile.genderType,
+                accessible: userProfile.accessible,
+                isHonors: userProfile.isHonors,
+                breakHousing: userProfile.breakHousing,
+                
+                // Step 2: Social & Lifestyle
+                socialLevelType: userProfile.socialLevelType,
+                noiseLevelType: userProfile.noiseLevelType,
+                activitiesImportance: userProfile.activitiesImportance,
+                environmentPref: userProfile.environmentPref,
+                yearPref: userProfile.yearPref,
+                sleepSchedule: userProfile.sleepSchedule,
+                tidinessLevel: userProfile.tidinessLevel,
+                lifestyleMatch: userProfile.lifestyleMatch,
+                guestFrequencyType: userProfile.guestFrequencyType,
+                
+                // Step 3: Amenities & Facilities
+                kitchenImportanceType: userProfile.kitchenImportanceType,
+                campusProximity: userProfile.campusProximity,
+                activityProximity: userProfile.activityProximity,
+                spaceType: userProfile.spaceType,
+                commuteDistanceType: userProfile.commuteDistanceType,
+                outdoorSpaceType: userProfile.outdoorSpaceType,
+                
+                // Step 4: Community & Interests
+                communityType: userProfile.communityType,
+                sharedInterestsType: userProfile.sharedInterestsType,
+                
+                // Step 5: Special Needs
+                sensitivitiesType: userProfile.sensitivitiesType,
+                
+                // Step 6: Priority Rankings (convert to object format)
+                priorities: {
+                    location: parseInt(userProfile.priorityLocation) || 1,
+                    privacy: parseInt(userProfile.priorityPrivacy) || 2,
+                    amenities: parseInt(userProfile.priorityAmenities) || 3,
+                    social: parseInt(userProfile.prioritySocial) || 4
+                }
+            };
+           
+            try {
+                // Create AbortController for timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+                
+                const response = await fetch(BACKEND_URL, {
+                        method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(backendProfile),
+                    signal: controller.signal
+                    });
+                
+                clearTimeout(timeoutId);
+
+                    if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                    }
+
+                    const result = await response.json();
+                
+                // Backend returns: { dorm_recommendation, ranked_matches, message, error }
+                if (result.error) {
+                    return { error: result.error };
+                }
+                
+                // Extract matches for display (show all matches, especially for quad rooms)
+                if (result.ranked_matches && result.ranked_matches.length > 0) {
+                    const firstMatch = result.ranked_matches[0];
+                    // Calculate average compatibility score for multiple matches
+                    const avgScore = result.ranked_matches.reduce((sum, m) => sum + (m.compatibilityScore || 0), 0) / result.ranked_matches.length;
+                    
+                    return {
+                        compatibilityScore: Math.round(avgScore),
+                        confidenceLevel: firstMatch.confidenceLevel || "Medium",
+                        reasoningSummary: result.message || `Found ${result.ranked_matches.length} compatible roommate match(es) based on your preferences.`,
+                        matchAdvice: firstMatch.matchAdvice || `Recommended dorm area: ${result.dorm_recommendation}`,
+                        dormRecommendation: result.dorm_recommendation,
+                        allMatches: result.ranked_matches,
+                        message: result.message || ""
+                    };
+                    } else {
+                    return {
+                        compatibilityScore: 0,
+                        confidenceLevel: "Low",
+                        reasoningSummary: result.message || "No compatible matches found. Try adjusting your preferences.",
+                        matchAdvice: `Recommended dorm area: ${result.dorm_recommendation || "None"}. ${result.message || ""}`,
+                        dormRecommendation: result.dorm_recommendation || "None",
+                        allMatches: []
+                    };
+                    }
+                } catch (error) {
+                console.error("Backend API Error:", error);
+                if (error.name === 'AbortError') {
+                    return { error: `Request timed out after ${REQUEST_TIMEOUT/1000} seconds. The matching process is taking longer than expected. Please try again or adjust your preferences.` };
+                }
+                return { error: `Failed to connect to backend: ${error.message}. Make sure the backend is running on port 8000.` };
+            }
+        }
+
+        // --- Form Submission Handler ---
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!validateCurrentStep()) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            // Collect all form data
+            const userProfile = {
+                // Step 1: Basic Information
+                yearStatus: document.getElementById('yearStatus').value,
+                major: document.getElementById('major').value,
+                roomType: document.getElementById('roomType').value,
+                genderType: document.getElementById('genderType').value,
+                accessible: document.getElementById('accessible').value,
+                isHonors: document.getElementById('isHonors').value,
+                breakHousing: document.getElementById('breakHousing').value,
+                
+                // Step 2: Social & Lifestyle
+                socialLevelType: document.getElementById('socialLevelType').value,
+                noiseLevelType: document.getElementById('noiseLevelType').value,
+                activitiesImportance: document.getElementById('activitiesImportance').value,
+                environmentPref: document.getElementById('environmentPref').value,
+                yearPref: document.getElementById('yearPref').value,
+                sleepSchedule: document.getElementById('sleepSchedule').value,
+                tidinessLevel: document.getElementById('tidinessLevel').value,
+                lifestyleMatch: document.getElementById('lifestyleMatch').value,
+                guestFrequencyType: document.getElementById('guestFrequencyType').value,
+                
+                // Step 3: Amenities & Facilities
+                kitchenImportanceType: document.getElementById('kitchenImportanceType').value,
+                campusProximity: document.getElementById('campusProximity').value,
+                activityProximity: document.getElementById('activityProximity').value,
+                spaceType: document.getElementById('spaceType').value,
+                commuteDistanceType: document.getElementById('commuteDistanceType').value,
+                outdoorSpaceType: document.getElementById('outdoorSpaceType').value,
+                
+                // Step 4: Community & Interests
+                communityType: document.getElementById('communityType').value,
+                sharedInterestsType: document.getElementById('sharedInterestsType').value,
+                
+                // Step 5: Special Needs
+                sensitivitiesType: document.getElementById('sensitivitiesType').value,
+                
+                // Step 6: Priority Rankings
+                priorityLocation: document.getElementById('priorityLocation').value,
+                priorityPrivacy: document.getElementById('priorityPrivacy').value,
+                priorityAmenities: document.getElementById('priorityAmenities').value,
+                prioritySocial: document.getElementById('prioritySocial').value
+            };
+
+            // Update UI to Loading State
+            form.style.display = 'none';
+            loadingIndicator.classList.remove('hidden');
+            resultsContainer.classList.add('hidden');
+
+            let matchResult;
+            try {
+            // Call the AI Matching Function
+                matchResult = await findCompatibilityMatch(userProfile);
+
+            // Update UI to Result State
+            loadingIndicator.classList.add('hidden');
+           
+            if (matchResult.error) {
+                alert(`Error: ${matchResult.error}`);
+                console.error("Match Error:", matchResult.error);
+                    form.style.display = 'block';
+                    return;
+                }
+            } catch (error) {
+                // Handle any unexpected errors
+                loadingIndicator.classList.add('hidden');
+                alert(`An unexpected error occurred: ${error.message}. Please try again.`);
+                console.error("Unexpected Error:", error);
+                form.style.display = 'block';
+                return;
+            }
+
+            // Render Results (only if we have a valid matchResult)
+            if (!matchResult) {
+                form.style.display = 'block';
+                return;
+            }
+            
+            resultsContainer.classList.remove('hidden');
+            
+            // Clear any previous dorm info
+            const existingDormInfo = resultsContainer.querySelector('.dorm-info');
+            if (existingDormInfo) {
+                existingDormInfo.remove();
+            }
+            
+            // Show dorm recommendation if available
+            if (matchResult.dormRecommendation) {
+                const dormInfo = document.createElement('div');
+                dormInfo.className = 'dorm-info mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200';
+                dormInfo.innerHTML = `<p class="font-semibold text-blue-800 text-lg">Recommended Dorm Area: <span class="text-blue-600">${matchResult.dormRecommendation}</span></p>`;
+                if (matchResult.allMatches && matchResult.allMatches.length > 0) {
+                    // Check if user selected quad room type
+                    const userRoomType = document.getElementById('roomType')?.value || '';
+                    const isQuadRoom = userRoomType.toLowerCase() === 'quad';
+                    
+                    if (isQuadRoom) {
+                        dormInfo.innerHTML += `<p class="text-sm text-blue-700 mt-2 font-semibold">Quad Room: Found ${matchResult.allMatches.length} of 3 needed roommates</p>`;
+                        if (matchResult.allMatches.length < 3) {
+                            dormInfo.innerHTML += `<p class="text-xs text-orange-600 mt-1">Note: A quad room requires 4 roommates total (you + 3 others). Only ${matchResult.allMatches.length} compatible match(es) found.</p>`;
+                        }
+                    } else {
+                        dormInfo.innerHTML += `<p class="text-sm text-blue-700 mt-2">Found ${matchResult.allMatches.length} compatible roommate match(es)</p>`;
+                    }
+                    
+                    // Display all roommate matches (always show for quad rooms, show all for other types if multiple)
+                    if (matchResult.allMatches.length > 1 || isQuadRoom) {
+                        let matchesList = '<div class="mt-4 space-y-2">';
+                        matchResult.allMatches.forEach((match, index) => {
+                            matchesList += `
+                                <div class="p-3 bg-white rounded border border-blue-200">
+                                    <p class="font-semibold text-gray-800">Roommate ${index + 1}: ${match.candidateName || 'N/A'}</p>
+                                    <p class="text-sm text-gray-600">Compatibility: ${match.compatibilityScore || 0}%</p>
+                                    ${match.recommendedDorms ? `<p class="text-xs text-gray-500 mt-1">${match.recommendedDorms}</p>` : ''}
+                                    ${match.matchAdvice ? `<p class="text-xs text-gray-400 mt-1 italic">${match.matchAdvice}</p>` : ''}
+                                </div>
+                            `;
+                        });
+                        matchesList += '</div>';
+                        dormInfo.innerHTML += matchesList;
+                    }
+                }
+                if (matchResult.message) {
+                    dormInfo.innerHTML += `<p class="text-sm text-orange-600 mt-2 font-medium">${matchResult.message}</p>`;
+                }
+                const heading = resultsContainer.querySelector('h2');
+                if (heading) {
+                    resultsContainer.insertBefore(dormInfo, heading);
+                } else {
+                    resultsContainer.insertBefore(dormInfo, resultsContainer.firstChild);
+                }
+            }
+            
+            scoreDisplay.textContent = matchResult.compatibilityScore || 0;
+            confidenceDisplay.textContent = matchResult.confidenceLevel || "Medium";
+            reasoningDisplay.textContent = matchResult.reasoningSummary || "No reasoning available.";
+            adviceDisplay.textContent = matchResult.matchAdvice || "No advice available.";
+
+            // Visual feedback based on score
+            const score = matchResult.compatibilityScore || 0;
+            if (score >= 80) {
+                resultsContainer.classList.add('border-green-500');
+                resultsContainer.classList.remove('border-yellow-500', 'border-red-500');
+            } else if (score >= 50) {
+                resultsContainer.classList.add('border-yellow-500');
+                resultsContainer.classList.remove('border-green-500', 'border-red-500');
+            } else {
+                resultsContainer.classList.add('border-red-500');
+                resultsContainer.classList.remove('border-green-500', 'border-yellow-500');
+            }
+        });
+
+        // Initialize
+        showStep(1);
+    </script>
+</body>
+</html>
